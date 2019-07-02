@@ -1,0 +1,1 @@
+org.springframework.boot.SpringApplicationRunListener=com.hehua.core.events.listeners.DynamicLoadingPluginListener

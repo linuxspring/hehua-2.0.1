@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/hehua-2.0.1/hehua-2.0.1.iml" filepath="$PROJECT_DIR$/hehua-2.0.1/hehua-2.0.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hehua-plugin-itsm-1.0.0/hehua-plugin-itsm-1.0.0.iml" filepath="$PROJECT_DIR$/hehua-plugin-itsm-1.0.0/hehua-plugin-itsm-1.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hehua-plugin-live-1.0.0/hehua-plugin-live-1.0.0.iml" filepath="$PROJECT_DIR$/hehua-plugin-live-1.0.0/hehua-plugin-live-1.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hehua-plugin-system-1.0.0/hehua-plugin-system-1.0.0.iml" filepath="$PROJECT_DIR$/hehua-plugin-system-1.0.0/hehua-plugin-system-1.0.0.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hehua.plugin.system.mapper.OAuthMapper">
+
+    <select id="countUser" resultType="int">
+        <if test="cityCode!='031200' and cityCode!='030500' and cityCode!='031400' and cityCode !='030300' ">
+            <![CDATA[
+            select count(*) from operatorm1 u where u.name=#{username} or u.name=#{userdot}
+            ]]>
+        </if>
+        <if test="cityCode=='030500'">
+            <![CDATA[
+            select count(*) from casp_user u where  u.loginid =#{username}
+            ]]>
+        </if>
+         <if test="cityCode=='031400' or cityCode=='031200'">
+            <![CDATA[
+            select count(*) from plat_user u where  u.username =#{username}
+         ]]>
+        </if> 
+        <if test="cityCode=='030300'">
+            <![CDATA[
+            select count(*) from t_s_base_user u where  u.USERNAME =#{username}
+         ]]>
+        </if> 
+    </select>
+    
+    <select id="getLists" parameterType="map" resultType="Client">
+		<![CDATA[
+		select * from oauth2_client
+		]]>
+	</select>
+
+    <select id="ListById" parameterType="map" resultType="Client">
+    <![CDATA[
+		select * from oauth2_client t where t.client_id=#{client_id}
+		]]>
+    </select>
+
+    <select id="ListBySecret" parameterType="map" resultType="Client">
+    <![CDATA[
+		select * from oauth2_client t where t.client_secret=#{client_secret}
+		]]>
+    </select>
+
+    
+</mapper>

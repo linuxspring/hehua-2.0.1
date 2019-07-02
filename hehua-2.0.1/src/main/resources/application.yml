@@ -1,0 +1,164 @@
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 180000
+logging:
+  path: ./log
+  file: ./${logging.path}/carbon.log
+server:
+  port: 8443
+  servlet:
+    context-path: /hehua
+  maxHttpHeaderSize: 10000000
+  ssl:
+    key-store: classpath:tomcat.keystore
+    key-store-password: 123456
+    key-store-type: JKS
+    key-alias: tomcat
+scheduled:
+  cron:0/5 * * * * ? *
+  shardingTotalCount:2
+  shardingItemParameters:0=Chengdu0,1=Chengdu1
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: hehua
+  cache:
+    type: ehcache #ehcache  redis
+  ehcache:
+    config:classpath:/ehcache.xml
+  redis:
+    host: 192.168.0.119
+    port: 6379
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+---
+spring:
+  profiles: development
+  storage:
+    storageMode: alioss
+    #     storageMode: local
+    mediaFolder: media/
+  datasource:
+    url: jdbc:mysql://localhost:3306/db-shiro?characterEncoding=utf-8
+    username: root
+    password: oa.oracle
+logging:
+  level:
+    root: info
+---
+spring:
+  profiles: local
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/db_shiro?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    username: root
+    password: oa.oracle
+  redis:
+    host: 192.168.0.119
+    port: 6379
+---
+spring:
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
+    #static-path-pattern: /**
+  application:
+    name: hehua
+  aop:
+    proxy-target-class: true
+    auto: true
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    #druid相关配置
+    druid:
+      default:
+        url: jdbc:mysql://127.0.0.1:3306/db_shiro?characterEncoding=utf-8&serverTimezone=GMT%2B8
+        #url: jdbc:oracle:thin:@172.16.3.223:1521:orcl
+        username: portal
+        password: gzcss
+        #driver-class-name: com.mysql.jdbc.Driver
+        #driver-class-name: oracle.jdbc.driver.OracleDriver
+        #监控统计拦截的filters
+        filters: stat,config
+        #配置初始化大小/最小/最大
+        initial-size: 1
+        min-idle: 1
+        max-active: 20
+        #获取连接等待超时时间
+        max-wait: 60000
+        #间隔多久进行一次检测，检测需要关闭的空闲连接
+        time-between-eviction-runs-millis: 60000
+        #一个连接在池中最小生存的时间
+        min-evictable-idle-time-millis: 300000
+        validation-query: SELECT 'x' from dual
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+        #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+        pool-prepared-statements: false
+        max-pool-prepared-statement-per-connection-size: 20
+      db11:
+        url: jdbc:mysql://127.0.0.1:3306/db_shiro?characterEncoding=utf-8&serverTimezone=GMT%2B8
+        driver-class-name: com.mysql.jdbc.Driver
+        username: root
+        password: oa.oracle
+      db1:
+        username: portal
+        password: gzcss
+        driver-class-name: oracle.jdbc.driver.OracleDriver
+        url: jdbc:oracle:thin:@172.16.3.223:1521:orcl
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+      db22:
+        username: root
+        password: root
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://172.16.11.97:3306/cmdb?characterEncoding=utf-8&serverTimezone=GMT%2B8
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+      db2:
+        username: root
+        password: oa.oracle
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/shiro?characterEncoding=utf-8&serverTimezone=GMT%2B8
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+
+mybatis-plus:
+  # 如果是放在src/main/java目录下 classpath:/com/yourpackage/*/mapper/*Mapper.xml
+  # 如果是放在resource目录 classpath:/mapper/*Mapper.xml
+  mapper-locations: classpath:/com/hehua/plugin/system/mapper/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.pinyi.plugin.devastate.alarm.entity
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 0
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #mp2.3+ 全局表前缀 mp_
+    #table-prefix: mp_
+    #刷新mapper 调试神器
+    refresh-mapper: true
+    #数据库大写下划线转换
+    #capital-mode: true
+    #逻辑删除配置（下面3个配置）
+    logic-delete-value: 4
+    logic-not-delete-value: 0
+  configuration:
+    #配置返回数据库(column下划线命名&&返回java实体是驼峰命名)，自动匹配无需as（没开启这个，SQL需要写as： select user_id as userId）
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull, oracle数据库必须配置
+    jdbc-type-for-null: 'null'

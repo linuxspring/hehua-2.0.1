@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hehua.plugin.system.mapper.DeptMapper">
+
+    <select id="countUser" resultType="int">
+        <![CDATA[
+        select count(*) from PLAT_USER
+        ]]>
+    </select>
+    
+    <select id="getList" resultType="User">
+		<![CDATA[
+		select * from PLAT_USER
+		]]>
+	</select>
+
+	<select id="getDeptUsersView" parameterType="map" resultType="com.gzcss.weixin.model.Plat_User">
+		select distinct t.USER_ID AS id,username,PASSWORD AS password,fullname,email,address,postcode,fax,description,user_state,user_key,isdeleted AS isDeleted,gender,comfirm_method AS comfirmMethod,idcard_no AS idcardNo,reg_time AS regTime,office_tel AS officeTel,block_up_time AS blockUpTime,is_start_up AS isStartUp,loginnum,createtime,ulevel,TYPE AS type,tel,tel2,sign,lastupdate,cnname,qq,POSITION AS position,link,age,autoid,comid,wx,version,TENANTID AS tenantId from PLAT_USER t,plat_user_dept ud where ud.user_id=t.user_id and ud.dept_id=#{deptid}
+		<if test="fullname != null and fullname != ''">
+			and (
+			fullname like concat(concat('%',#{fullname}),'%')
+			or username like concat(concat('%',#{fullname}),'%')
+			or autoid like concat(concat('%',#{fullname}),'%')
+			or tel like concat(concat('%',#{fullname}),'%')
+			)
+		</if>
+	</select>
+
+	<insert id="addUsersToRole2">
+		MERGE INTO PLAT_USER_ROLE t
+		USING (
+		<foreach collection="list" item="item" index="index" separator="," >
+			select #{item} user_id,
+			#{roleid} role_id
+			from PLAT_USER_ROLE
+		</foreach>) t1
+		ON (t.user_id =  t1.user_id AND t.role_id = t1.role_id)
+		WHEN MATCHED THEN
+		UPDATE SET t.user_id = t1.user_id
+		WHEN NOT MATCHED THEN
+		INSERT(user_id, role_id)
+		VALUES (t1.user_id, t1.role_id)
+	</insert>
+
+	<insert id="addUsersToDept">
+		INSERT INTO PLAT_USER_DEPT(user_id, dept_id) VALUES (#{user_id}, #{dept_id})
+
+	</insert>
+
+	<delete id="removeUsersFromDept" parameterType="map">
+		delete from PLAT_USER_DEPT t where t.dept_id=#{dept_id} and t.user_id in
+		<foreach item="item" collection="userids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="getAcountByMapUserName" parameterType="string" resultType="string">
+		<![CDATA[
+		select t.itsm_username from QIXIN_USER t where t.wechat_username=#{account} and t.agentid=5
+		]]>
+	</select>
+
+	<select id="getQixinAcountByUserName" parameterType="string" resultType="string">
+		<![CDATA[
+		select t.wechat_username from QIXIN_USER t where t.itsm_username=#{account} and t.agentid=5
+		]]>
+	</select>
+
+	<select id="getQixinAcountByUserNames" parameterType="map" resultType="java.util.HashMap">
+		select t.wechat_username,t.itsm_username from QIXIN_USER t where t.itsm_username in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      	#{item}
+     	</foreach>
+	</select>
+
+	<select id="getEventOrderStatus" parameterType="map" resultType="java.util.HashMap">
+		<![CDATA[
+		select p."NUMBER" numbers, case when p.css_status like concat(concat('%','处理中'),'%') then 'true' else 'false' end isJieShou,
+		case when p.assignee_name is  null then
+		case when (select ass.operators   from assignmenta1 ass where ass.name
+		=p.assignment and ass.operators = #{username}) is null then 'false' else 'true' end
+		else case when (select c.operator_id from contctsm1 c where c.operator_id in
+		(select ass.operators  from assignmenta1  ass  where ass.name
+		=p.assignment) and c.full_name = p.assignee_name and c.operator_id = #{username})
+		is null   then 'false' else 'true' end end isFenPa,
+		css_status  from probsummarym1 p  where p."NUMBER"=#{orderNo}
+		]]>
+	</select>
+
+	<select id="getOrderOwnerInfo" parameterType="string" resultType="map">
+		<![CDATA[
+		select (select c.operator_id  from contctsm1 c where c.contact_name = p.css_serviceid and c.full_name = p.css_sercicename) as username,p.css_sercicename as full_name from probsummarym1 p  where "NUMBER" = #{orderNo}
+		]]>
+	</select>
+
+	<select id="getOrderCurrentInfo" parameterType="string" resultType="map">
+		<![CDATA[
+		select t.assignee_name,t.assignment,t.css_status,nvl((select o.name from operatorm1 o where o.full_name = t.assignee_name and o.name
+ 		in (select a.operators  from assignmenta1 a where a.name   = t.assignment)),(select o.name
+  		from operatorm1 o where o.full_name = t.assignee_name and rownum =1) ) uname,
+ 		(select c.operator_id from contctsm1 c where c.contact_name=t.css_req_id) submit_id,t.css_req_name submit_name from probsummarym1 t
+ 		where t."NUMBER"  = #{orderNo}
+ 		]]>
+	</select>
+
+	<select id="getPleaseOrderCurrentInfo" parameterType="map" resultType="map">
+		<![CDATA[
+ 			select t."NUMBER" id,t.wechat_agreest,to_char(t.css_appr_id) appr_id,t.current_phase,t.assigned_to,to_char(t.css_appr_name) css_appr_name,nvl(to_char(css_appr_num),'0') css_appr_num from ocmqm1 t where t."NUMBER" = #{orderNo}
+			and instr(  concat(',',concat(t.assigned_to,',')),
+			concat(',',concat(( select o.full_name from operatorm1 o where o.full_name = #{username} ),',' )))>0
+ 		]]>
+	</select>
+
+	<update id="doorToDoor" parameterType="map">
+		<![CDATA[
+		UPDATE probsummarym1  set yysm_time= TO_DATE(#{fromDate},'yyyy-mm-dd hh24:mi:ss') where "NUMBER" =#{orderNo}
+		]]>
+	</update>
+
+	<select id="getSurveyResult" parameterType="string" resultType="string">
+		<![CDATA[
+		SELECT RESULT FROM INCIDENTSM1 WHERE INCIDENT_ID=#{INCIDENT_ID}
+		]]>
+	</select>
+
+	<update id="updateClientSurvey" parameterType="map" >
+		<![CDATA[
+		UPDATE CLIENT_SATISFACTION_SURVEY SET INCIDENT_EFFICIENCY=#{RESOLVE_EFFI},INCIDENT_SERVICE=#{ATTITUDE},INCIDENT_RESULT=#{RESULT},INCIDENT_ADVICE=#{RETURNIDEA},TUPDATETIME=#{TUPDATETIME},FLAG=#{FLAG} WHERE SURVEY_ID=#{SURVEY_ID}
+		]]>
+	</update>
+
+	<update id="updateIncident" parameterType="map" >
+		<![CDATA[
+		UPDATE INCIDENTSM1 SET CSS_RESOLVE_EFFICIENCY=#{RESOLVE_EFFI},CSS_SERVE_ATTITUDE=#{ATTITUDE},CSS_SKILL=#{SKILL},CSS_CONTENTMENT=#{CONTENTMENT},RESULT=#{RESULT},CSS_RETURNIDEA=#{RETURNIDEA} WHERE INCIDENT_ID=#{INCIDENT_ID}
+		]]>
+	</update>
+
+	<select id="getSurveyHead" parameterType="map" resultType="map">
+		<![CDATA[
+		SELECT INCIDENT_ID,TITLE,CALLBACK_CONTACT_FULLNAME,CSS_RESOLVE_EFFICIENCY,CSS_SERVE_ATTITUDE,CSS_SKILL,to_char(CSS_RETURNIDEA),RESULT FROM INCIDENTSM1 WHERE INCIDENT_ID=#{INCIDENT_ID}
+		]]>
+	</select>
+
+	<select id="getItsmUserNameByTel" parameterType="string" resultType="string">
+		<![CDATA[
+		select t.OPERATOR_ID from  CONTCTSM1 t where t.portable_phone =#{tel}
+		]]>
+	</select>
+
+	<insert id="addUserNameToQixin" parameterType="map" >
+		<![CDATA[
+		insert into qixin_user values('',#{itsm_username},#{qixin_userid},5)
+		]]>
+	</insert>
+
+	<!-- 请求-审批 -->
+	<update id="ocmqUpdate" parameterType="map">
+		<![CDATA[
+			update ocmqm1 set wechat_agreest=#{value} where "NUMBER"=#{number}
+		]]>
+	</update>
+</mapper>

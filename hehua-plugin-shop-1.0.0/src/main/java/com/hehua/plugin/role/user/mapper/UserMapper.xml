@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinyi.plugin.devastate.user.mapper">
+
+
+
+    <resultMap type="user" id="userResultMap">
+        <id column="user_id" property="user_id"/>
+        <result column="user_name" property="user_name"/>
+        <result column="fullname" property="fullname"/>
+    </resultMap>
+
+    <resultMap type="role" id="roleResultMap">
+        <id column="role_id" property="role_id"/>
+        <result column="role_name" property="role_name"/>
+    </resultMap>
+
+    <resultMap type="user" id="userroleResultMap" extends="userResultMap">
+        <collection property="roles" resultMap="roleResultMap" />
+    </resultMap>
+
+    <select id="countUser" resultType="Long">
+        <![CDATA[
+        select count(*) from user
+        ]]>
+    </select>
+
+    <select id="getList" resultType="list" resultMap="userResultMap">
+		<![CDATA[
+		select * from user
+		]]>
+	</select>
+
+    <select id="findByAccount" parameterType="string" resultMap="userResultMap">
+		<![CDATA[
+		select * from plat_user where user_name like '%ad%'
+		]]>
+	</select>
+
+    <select id="findUserWithRoles" parameterType="string" resultMap="userroleResultMap">
+    	<![CDATA[
+		select u.user_id as user_id, u.user_name as user_name, u.fullname as fullname, r.role_id as role_id, r.role_name as role_name from plat_user u left join plat_user_role ur on ur.user_id=u.user_id left join plat_role r on ur.role_id=r.role_id where user_name = #{account}
+		]]>
+    </select>
+
+    <insert id="insertUser" parameterType="Object">
+  		insert into plat_user(user_id, user_name, fullname, user_state, user_key, gender) values(SEQ_USER_ID.nextval,#{user_name},#{fullname}, 1, 'testkey', 1)
+  	</insert>
+
+
+    <update id="updateUser" parameterType="user">
+        update plat_user
+        <set>
+            <if test="fullname != null">fullname=#{fullname}</if>
+        </set>
+        where user_name=#{user_name}
+    </update>
+
+    <delete id="delete" parameterType="Object">
+    	delete from plat_user where user_id = #{id}
+    </delete>
+
+
+</mapper>

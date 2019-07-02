@@ -1,0 +1,60 @@
+/*通用*/
+body{
+}
+.container-fluid{
+	background-color: #fff;
+}
+/*输入框*/
+.hd{
+	height: 57px;
+	border-bottom: 1px solid #eee;
+	padding-left: 22px;
+}
+.hd p{
+	float: left;
+	line-height: 55px;
+	font-size: 16px;
+	border-bottom: 2px solid #1587ec;
+	margin-bottom: 0;
+}
+.hd .btn-groups{
+	float: right;
+	margin-top: 12px;
+	margin-right: 20px;
+}
+.hd .btn-groups button{
+	margin-left: 10px;
+	background-color: #1687ed;
+	border: 0;
+}
+
+.btn-group-pr button{
+	margin-left: 10px;
+	background-color: #1687ed;
+	border: 0;
+	margin-top: 12px;
+}
+
+.search-form label{
+	font-weight: initial;
+	position: relative;
+	top: 6px;
+	text-align: right;
+}
+.search-tr{
+	margin: 9px 0;
+}
+.p-r{
+	position: relative;
+}
+.p-a{
+	position: absolute;
+}
+.date{
+	right: 6%;
+    top: 9px;
+    cursor: pointer;
+}
+.search-form .form-control{
+	height: 40px;
+}
