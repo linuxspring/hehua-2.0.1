@@ -17,5 +17,6 @@ public class ScheduleTask {
     @Scheduled(cron= "${scheduled.cron}")
     protected void printHello() {
         helloWorld.printHello();
+        System.out.println(" = ");
     }
 }
